@@ -1,0 +1,270 @@
+﻿
+@{
+    ViewBag.Title = "Population Pyramid Animation";
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div id="zc" class="chart--container">
+        </div>
+    </div>
+</div>
+<script>
+    ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"]; // window:load event for Javascript to run after HTML
+    // because this Javascript is injected into the document head
+    window.addEventListener('load', () => {
+      // Javascript code to execute after DOM content
+
+      // point to modules directory
+      zingchart.MODULESDIR = 'https://cdn.zingchart.com/modules/';
+
+
+      /* find min/max years */
+      var iStartYear = 9999,
+        iEndYear = 0,
+        k;
+      for (var k in _DATA_) {
+        iStartYear = Math.min(iStartYear, parseInt(k, 10));
+        iEndYear = Math.max(iEndYear, parseInt(k, 10));
+      }
+
+      var aSeries = [],
+        aYears = [],
+        nrCurrent = 0;
+      for (k in _DATA_) {
+        aSeries[k] = [];
+        aSeries[k][0] = [];
+        aSeries[k][1] = [];
+        aSeries[k][2] = [];
+        aSeries[k][3] = [];
+        aSeries[k][4] = [];
+
+        aYears.push(k);
+        for (var i = 1; i < _DATA_[k].length; i++) {
+          if (i > 0 && i <= 18) {
+            aSeries[k][0].push([i - 1, _DATA_[k][i]]);
+          }
+          if (i >= 19 && i <= 65) {
+            aSeries[k][1].push([i - 1, _DATA_[k][i]]);
+          }
+          if (i >= 66) {
+            aSeries[k][2].push([i - 1, _DATA_[k][i]]);
+          }
+          aSeries[k][3].push([i - 1, _DATA_[iStartYear + ''][i]]);
+          aSeries[k][4].push([i - 1, _DATA_[iEndYear + ''][i]]);
+        }
+      }
+
+      var chartJSON = {
+
+        graphset: [{
+          backgroundColor: '#fff',
+          type: 'mixed',
+
+          plotarea: {
+            marginLeft: 60
+          },
+
+          title: {
+            text: 'Population Distribution by Age Group in 2016',
+            fontSize: 18,
+            fontColor: '#000',
+            paddingLeft: 20,
+            align: 'left'
+          },
+
+          source: {
+            align: 'left',
+            text: 'Original design by u/mskm203 at https://www.reddit.com/r/dataisbeautiful/',
+            url: 'https://www.reddit.com/r/dataisbeautiful/comments/9ui848/oc_us_population_projections_by_age_through_2060/',
+            target: '_blank'
+          },
+
+          plot: {
+            alphaArea: 1,
+            hoverState: {
+              visible: false
+            },
+            marker: {
+              visible: false
+            },
+            maxTrackers: 0
+          },
+
+          scaleX: {
+            minValue: 0,
+            maxValue: 105,
+            step: 5,
+            maxItems: 999,
+            label: {
+              text: 'Age',
+              fontColor: '#878A8C',
+              fontSize: 13,
+              fontWeight: 'bold'
+            },
+            itemsOverlap: true,
+            lineWidth: 1,
+            lineColor: '#eee',
+            item: {
+              color: '#878A8C',
+              fontSize: 11,
+              fontWeight: 'normal'
+            },
+            guide: {
+              visible: true,
+              lineStyle: 'solid',
+              lineColor: '#eee'
+            },
+            tick: {
+              visible: false
+            },
+            markers: [{
+                type: 'area',
+                alpha: 0,
+                backgroundColor: '#97CBCD',
+                label: {
+                  text: 'Child<br><span style="font-size:10px;">0-17 years</span>',
+                  fontSize: 16,
+                  fontColor: '#2c8e8d',
+                  fontWeight: 'bold',
+                  padding: '5 5 15 10',
+                  align: 'left'
+                },
+                valueRange: true,
+                range: [0, 17]
+              },
+              {
+                type: 'area',
+                alpha: 0,
+                backgroundColor: '#FFB66B',
+                label: {
+                  text: 'Middle Age<br><span style="font-size:10px;">18-64 years</span>',
+                  fontSize: 16,
+                  fontColor: '#ed7e00',
+                  fontWeight: 'bold',
+                  padding: '5 5 15 10',
+                  align: 'left'
+                },
+                valueRange: true,
+                range: [18, 64]
+              },
+              {
+                type: 'area',
+                alpha: 0,
+                backgroundColor: '#FF9991',
+                label: {
+                  text: 'Senior<br><span style="font-size:10px;">65+ years</span>',
+                  fontSize: 16,
+                  fontColor: '#e03d38',
+                  fontWeight: 'bold',
+                  padding: '5 5 15 10',
+                  align: 'left'
+                },
+                valueRange: true,
+                range: [65, 100]
+              }
+            ]
+          },
+
+          scaleY: {
+            minValue: 0,
+            maxValue: 6000000,
+            format: '%v',
+            short: true,
+            label: {
+              text: 'Estimate',
+              fontColor: '#878A8C',
+              fontSize: 13,
+              fontWeight: 'bold'
+            },
+            lineWidth: 1,
+            lineColor: '#eee',
+            item: {
+              color: '#878A8C',
+              fontSize: 11,
+              fontWeight: 'normal'
+            },
+            guide: {
+              visible: true,
+              lineStyle: 'solid',
+              lineColor: '#eee'
+            },
+            tick: {
+              visible: false
+            }
+          },
+
+          series: [{
+              type: 'area',
+              values: aSeries[aYears[nrCurrent]][0],
+              backgroundColor: '#97CBCD',
+              lineColor: '#5BAFAE'
+            },
+            {
+              type: 'area',
+              values: aSeries[aYears[nrCurrent]][1],
+              backgroundColor: '#FFB66B',
+              lineColor: '#FF900C'
+            },
+            {
+              type: 'area',
+              values: aSeries[aYears[nrCurrent]][2],
+              backgroundColor: '#FF9991',
+              lineColor: '#FF5C55'
+            },
+            {
+              type: 'line',
+              values: aSeries[aYears[nrCurrent]][3],
+              lineStyle: 'dotted',
+              lineWidth: 1,
+              lineColor: '#333'
+            },
+            {
+              type: 'line',
+              values: aSeries[aYears[nrCurrent]][4],
+              lineStyle: 'dotted',
+              lineWidth: 1,
+              lineColor: '#333'
+            }
+          ]
+        }]
+
+      };
+
+      var update = function() {
+
+        if (nrCurrent < aYears.length - 1) {
+          nrCurrent++;
+        } else {
+          nrCurrent = 0;
+        }
+
+        zingchart.exec('zc', 'modify', {
+          object: 'title',
+          data: {
+            text: 'Population Distribution by Age Group in ' + aYears[nrCurrent]
+          },
+          update: false
+        });
+
+        zingchart.exec('zc', 'setseriesvalues', {
+          graphid: 0,
+          values: aSeries[aYears[nrCurrent]]
+        });
+      };
+
+      zingchart.render({
+        id: 'zc',
+        width: '100%',
+        height: '100%',
+        output: "svg",
+        data: chartJSON,
+        events: {
+          load: function() {
+            setInterval(function() {
+              update();
+            }, 100);
+          }
+        }
+      });
+    });
+</script>
